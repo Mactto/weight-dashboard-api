@@ -6,10 +6,14 @@ import {
   ExerciseCategoryTopicService,
 } from './topic.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Dashboard, ExerciseCategory } from 'src/dashboard/dashboard.entity';
+import {
+  DailyLog,
+  Dashboard,
+  ExerciseCategory,
+} from 'src/dashboard/dashboard.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ExerciseCategory, Dashboard])],
+  imports: [TypeOrmModule.forFeature([ExerciseCategory, Dashboard, DailyLog])],
   providers: [
     KafkaService,
     DailyLogTopicService,

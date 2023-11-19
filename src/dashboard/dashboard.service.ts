@@ -10,8 +10,14 @@ export class DashboardService {
     private dashboardRepository: Repository<Dashboard>,
   ) {}
 
-  async findAll() {
+  async findAll(filterExerciseCategoryId?: string) {
     const query = this.dashboardRepository.createQueryBuilder('dashboard');
+
+    if (filterExerciseCategoryId) {
+      query.andWhere('dashboard.exerciseCategoryId = :exerciseCategoryId', {
+        exerciseCategoryId: filterExerciseCategoryId,
+      });
+    }
 
     return await query.getMany();
   }

@@ -1,21 +1,24 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Dashboard {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column('uuid')
+  exerciseCategoryId: string;
 
   @Column({ type: 'date' })
   date: Date;
 
-  @Column({ default: '' })
-  exercise_type: string;
+  @Column({ default: 0 })
+  count: number;
 
   @Column({ default: 0 })
-  sum_count: number;
+  weight: number;
 
-  @Column({ default: 0 })
-  sum_weight: number;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
 }
 
 @Entity()
@@ -25,4 +28,13 @@ export class ExerciseCategory {
 
   @Column()
   name: string;
+}
+
+@Entity()
+export class DailyLog {
+  @PrimaryColumn('uuid')
+  id: string;
+
+  @Column()
+  date: Date;
 }

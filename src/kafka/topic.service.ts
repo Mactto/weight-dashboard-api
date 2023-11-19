@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Dashboard, ExerciseCategory } from 'src/dashboard/dashboard.entity';
+import {
+  DailyLog,
+  Dashboard,
+  ExerciseCategory,
+} from 'src/dashboard/dashboard.entity';
 import { Repository } from 'typeorm';
 
 const parseMessage = (message: string) => {
@@ -10,18 +14,18 @@ const parseMessage = (message: string) => {
 @Injectable()
 export class DailyLogTopicService {
   constructor(
-    @InjectRepository(Dashboard)
-    private readonly dashboardRepository: Repository<Dashboard>,
+    @InjectRepository(DailyLog)
+    private readonly dailyLogRepository: Repository<DailyLog>,
   ) {}
 
   async handle(message: string): Promise<void> {
     const data = await parseMessage(message);
 
-    const dashboard = new Dashboard();
-    dashboard.id = data.id;
-    dashboard.date = new Date(data.date * 86400000);
+    const dailyLog = new DailyLog();
+    dailyLog.id = data.id;
+    dailyLog.date = new Date(data.date * 86400000);
 
-    await this.dashboardRepository.save(dashboard);
+    await this.dailyLogRepository.save(dailyLog);
   }
 }
 
@@ -48,28 +52,25 @@ export class PerformanceLogTopicService {
   constructor(
     @InjectRepository(Dashboard)
     private readonly dashboardRepository: Repository<Dashboard>,
-    @InjectRepository(ExerciseCategory)
-    private readonly exerciseCategoryRepository: Repository<ExerciseCategory>,
+    @InjectRepository(DailyLog)
+    private readonly dailyLogRepository: Repository<DailyLog>,
   ) {}
 
   async handle(message: string): Promise<void> {
     const data = await parseMessage(message);
 
-    const dashboard = await this.dashboardRepository.findOne({
+    const dailyLog = await this.dailyLogRepository.findOne({
       where: {
         id: data.daily_log_id,
       },
     });
 
-    const exerciseCategory = await this.exerciseCategoryRepository.findOne({
-      where: {
-        id: data.exercise_category_id,
-      },
-    });
-
-    dashboard.sum_count = dashboard.sum_count + data.count;
-    dashboard.sum_weight = dashboard.sum_weight + data.weight;
-    dashboard.exercise_type = exerciseCategory.name;
+    const dashboard = new Dashboard();
+    dashboard.exerciseCategoryId = data.exercise_category_id;
+    dashboard.count = data.count;
+    dashboard.weight = data.weight;
+    dashboard.date = dailyLog.date;
+    dashboard.createdAt = data.created;
 
     await this.dashboardRepository.save(dashboard);
   }
